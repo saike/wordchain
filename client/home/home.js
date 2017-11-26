@@ -6,7 +6,7 @@
 
    template: `
       <div>
-        <span data-ng-repeat="word in $ctrl.wordchain track by $index">{{ word }} </span>
+        <span data-ng-repeat="word in $ctrl.wordchain track by $index">{{ word.text }} </span>
         <form class="word_form" data-ng-submit="$ctrl.create_word()">
           <input class="word_input" type="text" data-ng-model="$ctrl.word">
         </form>   
