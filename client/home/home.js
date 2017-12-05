@@ -8,23 +8,53 @@
       <div>
         <span data-ng-repeat="word in $ctrl.wordchain track by $index">{{ word.text }} </span>
         <form class="word_form" data-ng-submit="$ctrl.create_word()">
-          <input class="word_input" type="text" data-ng-model="$ctrl.word">
+          <input data-ng-show="!$ctrl.busy" class="word_input" type="text" data-ng-model="$ctrl.word" data-ng-change="$ctrl.start_typing()">
+          <span data-ng-show="$ctrl.busy">
+            <span class="one">.</span><span class="two">.</span><span class="three">.</span>​
+          </span>
         </form>   
       </div>
    `,
-   controller: function (io, $scope) {
+   controller: function (io, $scope, $window, $element) {
 
      this.wordchain = [];
 
      this.word = '';
 
+     this.busy = false;
+
      this.$onInit = () => {
+
+       let input = $element[0].querySelector('.word_input');
+
+       input.focus();
 
        this.socket = io.connect('/');
 
        this.socket.on('wordchain:list', (list) => {
 
          this.wordchain = list;
+         $scope.$apply();
+
+       });
+
+       this.socket.on('wordchain:typing:busy', (socket_id) => {
+
+         if(this.socket.id !== socket_id) {
+
+           this.busy = true;
+           $scope.$apply();
+
+         }
+
+       });
+
+       this.socket.on('wordchain:typing:idle', () => {
+
+         this.busy = false;
+
+         input.focus();
+
          $scope.$apply();
 
        });
@@ -38,6 +68,21 @@
        this.socket.emit('wordchain:create', this.word);
 
        this.word = '';
+
+     };
+
+     this.start_typing = () => {
+
+       if(this.word.length > 0){
+
+         this.socket.emit('wordchain:typing:start', this.word);
+
+       }
+       else {
+
+         this.socket.emit('wordchain:typing:cancel', this.word);
+
+       }
 
      };
 

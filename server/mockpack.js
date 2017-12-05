@@ -44,16 +44,6 @@ app.get('/', function (req, res) {
   res.render('index', {});
 });
 
-let WordChain = [
-  'nastya',
-  'afdsfasdf',
-  'asdfasdfasd',
-  'ahahaha',
-  'netenet',
-  'ewirtuweorgh',
-  'fsadfasdf'
-];
-
 //sockets configurations
 io.on('connection', function(socket){
 
@@ -69,6 +59,7 @@ io.on('connection', function(socket){
 
         WordController.list().then((words) => {
           io.sockets.emit('wordchain:list', words);
+          io.sockets.emit('wordchain:typing:idle', socket.id);
         });
 
       });
@@ -82,10 +73,22 @@ io.on('connection', function(socket){
 
   });
 
+  socket.on('wordchain:typing:start', function () {
+
+    io.sockets.emit('wordchain:typing:busy', socket.id);
+
+  });
+
+  socket.on('wordchain:typing:cancel', function () {
+
+    io.sockets.emit('wordchain:typing:idle', socket.id);
+
+  });
+
   console.log('a user connected', socket.id);
 
 });
 
-server.listen(3000, function () {
+server.listen(80, function () {
   console.log('server is running now');
 });
