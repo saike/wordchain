@@ -4,11 +4,16 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "./node_modules/.bin/nodemon -L --exec node ./server/mockpack.js"
+    "dev": "./node_modules/.bin/nodemon -L --exec node ./server/mockpack.js",
+    "prod": "./node_modules/.bin/pm2 start ./server/mockpack.js",
+    "rebundle": "rm -rf ./node_modules/ && rm -rf ./client/node_modules/ && rm -rf ./server/node_modules/ && npm i && cd ./server/ && npm i && cd ../client/ && npm i && cd .."
   },
   "author": "",
   "license": "ISC",
   "devDependencies": {
     "nodemon": "^1.12.1"
+  },
+  "dependencies": {
+    "pm2": "^2.8.0"
   }
 }
